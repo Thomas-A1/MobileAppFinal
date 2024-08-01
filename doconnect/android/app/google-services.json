@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "273314792235",
+    "project_id": "doconnect-b45a9",
+    "storage_bucket": "doconnect-b45a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:273314792235:android:8fdbf48181ed8fed58fb6e",
+        "android_client_info": {
+          "package_name": "com.example.doconnect"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "273314792235-9c0jsvbvlhfrj3cdnsskfaai98n6s0kt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUYAiOtdEkXMouuJhwVAABcLdfJ0xxkQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "273314792235-9c0jsvbvlhfrj3cdnsskfaai98n6s0kt.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "273314792235-3vl5p13rs7oouodjv10uc2k394khrig8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.doconnect"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
