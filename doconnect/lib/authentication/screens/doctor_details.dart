@@ -1,5 +1,6 @@
 import 'package:doconnect/Models/auth_model.dart';
 import 'package:doconnect/Models/user_model.dart';
+import 'package:doconnect/authentication/screens/BookingPage/bookingpage.dart';
 import 'package:doconnect/data/repositories/doctors/doctor_controller.dart';
 import 'package:doconnect/widgets/customAppbar.dart';
 import 'package:flutter/material.dart';
@@ -9,8 +10,11 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DoctorDetails extends StatelessWidget {
-  const DoctorDetails({Key? key, required this.doctorId}) : super(key: key);
+  const DoctorDetails(
+      {Key? key, required this.doctorId, required this.doctor_name})
+      : super(key: key);
   final String doctorId;
+  final String doctor_name;
 
   @override
   Widget build(BuildContext context) {
@@ -68,21 +72,23 @@ class DoctorDetails extends StatelessWidget {
                 doctor: doctor,
               ),
               const Spacer(),
-              Padding(
-                padding: const EdgeInsets.all(20),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        Colors.blue, // Set your desired button color here
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('booking_page',
-                        arguments: {"doctor_id": doctor.id});
-                  },
-                  child: const Text(
-                    'Book Appointment',
-                    style: TextStyle(fontSize: 16),
-                  ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor:
+                      Colors.blue, // Set your desired button color here
+                ),
+                onPressed: () {
+                  Get.to(
+                    () => BookingPage(),
+                    arguments: {
+                      "doctor_id": doctor.id,
+                      "doctor_name": doctor_name
+                    },
+                  );
+                },
+                child: const Text(
+                  'Book Appointment',
+                  style: TextStyle(fontSize: 16),
                 ),
               ),
             ],
@@ -130,7 +136,7 @@ class AboutDoctor extends StatelessWidget {
           SizedBox(
             width: screenWidth * 0.75,
             child: const Text(
-              'MBBS (International Medical University, Malaysia), MRCP (Royal College of Physicians, United Kingdom)',
+              'International Medical University, Malaysia, Ashesi (Royal College of Physicians, Ghana)',
               style: TextStyle(
                 color: Colors.grey,
                 fontSize: 15,
@@ -145,7 +151,7 @@ class AboutDoctor extends StatelessWidget {
           SizedBox(
             width: screenWidth * 0.75,
             child: const Text(
-              'Sarawak General Hospital',
+              'Korle-Bu General Hospital',
               style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.bold,
@@ -180,7 +186,8 @@ class DetailBody extends StatelessWidget {
             height: 25,
           ),
           DoctorInfo(
-            exp: doctor.expertise, // Ensure that this property exists in UserModel
+            exp: doctor
+                .expertise, // Ensure that this property exists in UserModel
           ),
           SizedBox(
             height: screenHeight * 0.05,
@@ -208,8 +215,7 @@ class DetailBody extends StatelessWidget {
 }
 
 class DoctorInfo extends StatelessWidget {
-  const DoctorInfo({Key? key, required this.exp})
-      : super(key: key);
+  const DoctorInfo({Key? key, required this.exp}) : super(key: key);
 
   final String exp; // Changed from int to String
 
@@ -231,8 +237,6 @@ class DoctorInfo extends StatelessWidget {
     );
   }
 }
-
-
 
 class InfoCard extends StatelessWidget {
   const InfoCard({Key? key, required this.label, required this.value})

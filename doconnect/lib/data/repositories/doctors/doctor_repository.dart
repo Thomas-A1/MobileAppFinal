@@ -228,4 +228,113 @@ class DoctorRepository extends GetxController {
       throw 'Something went wrong. Please try again';
     }
   }
+
+
+
+  Future<void> updateDoctorAppointment(
+    String doctorId, 
+    String doctorName, 
+    String date, 
+    String day, 
+    String time, 
+    String userId
+  ) async {
+    try {
+      final appointmentData = {
+        'date': date,
+        'day': day,
+        'time': time,
+        'userId': userId,
+        'userName': await _getUserName(userId),
+      };
+
+      await _db.collection('doctors').doc(doctorId)
+        .collection('appointments') // Appointments sub-collection
+        .add(appointmentData);
+    } catch (e) {
+      throw 'Error updating doctor appointment: $e';
+    }
+  }
+
+  Future<String> _getUserName(String userId) async {
+    try {
+      final userDoc = await _db.collection('Users').doc(userId).get();
+      final userData = userDoc.data() as Map<String, dynamic>;
+      return userData['firstname'] ?? 'Unknown';
+    } catch (e) {
+      throw 'Error fetching user name: $e';
+    }
+  }
+
+  // Fetch all appointments for a specific doctor
+  Future<List<Map<String, dynamic>>> fetchAppointmentsForDoctor(String doctorId) async {
+    try {
+      final querySnapshot = await _db
+          .collection('doctors')
+          .doc(doctorId)
+          .collection('appointments')
+          .get();
+
+      return querySnapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+    } on FirebaseException catch (e) {
+      throw MFirebaseException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong. Please try again';
+    }
+  }
+
+    Future<List<UserModel>> fetchAllDoctors() async {
+    try {
+      final querySnapshot = await _db.collection('doctors').get();
+      return querySnapshot.docs
+          .map((doc) => UserModel.fromSnapshot(doc))
+          .toList();
+    } on FirebaseException catch (e) {
+      throw MFirebaseException(e.code).message;
+    } catch (e) {
+      throw 'Something went wrong. Please try again';
+    }
+  }
+
+
+
+
+  Future<List<UserModel>> fetchFavoriteDoctors(String userId) async {
+    try {
+      // Fetch the user's document from Firestore
+      final userDoc = await _db.collection('Users').doc(userId).get();
+
+      if (!userDoc.exists) {
+        throw Exception('User not found');
+      }
+
+      // Extract the favorite doctors' IDs from the user's document
+      final favorites = userDoc.data()?['favorites'] as Map<String, dynamic>?;
+
+      if (favorites == null) {
+        return []; // No favorites
+      }
+
+      // Fetch the doctors' details based on the IDs
+      final doctorIds = favorites.keys.toList();
+      final doctorQueries = doctorIds.map((id) =>
+          _db.collection('Doctors').doc(id).get()).toList();
+
+      final doctorDocs = await Future.wait(doctorQueries);
+
+      // Convert the fetched documents to UserModel
+      final favoriteDoctors = doctorDocs.map((doc) {
+        if (doc.exists) {
+          return UserModel.fromSnapshot(doc);
+        } else {
+          return UserModel.empty();
+        }
+      }).toList();
+
+      return favoriteDoctors;
+    } catch (e) {
+      print('Error fetching favorite doctors: $e');
+      return [];
+    }
+  }
 }

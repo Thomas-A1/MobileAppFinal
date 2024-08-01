@@ -97,7 +97,9 @@ class DoctorCard extends StatelessWidget {
             Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => DoctorDetails(
-                  doctorId: doctorId, // Pass the ID to DoctorDetails
+                  doctorId: doctorId,
+                  doctor_name : doctor['doctor_name'],
+                  
                 ),
               ),
             );

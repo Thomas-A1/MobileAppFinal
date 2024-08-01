@@ -1,4 +1,6 @@
 import 'package:doconnect/authentication/screens/DoctorsExpertisePage/doctorsExpertise.dart';
+import 'package:doconnect/data/repositories/authentication_repository.dart';
+import 'package:doconnect/data/repositories/user/user_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -23,6 +25,35 @@ class _LandingPageState extends State<LandingPage> {
     {"icon": FontAwesomeIcons.personPregnant, "category": "Gynecology"},
     {"icon": FontAwesomeIcons.teeth, "category": "Dental"},
   ];
+
+  late Future<List<Map<String, dynamic>>> _appointmentsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _refreshPage();
+
+  }
+
+  void _refreshPage() {
+    setState(() {
+      _appointmentsFuture = _fetchAppointments();
+    });
+    _fetchUserDetails(); // Fetch user details
+  }
+
+    void _fetchUserDetails() {
+    final userController = UserController.instance;
+    userController.fetchUserRecords(); // Ensure this method is implemented in UserController
+  }
+
+  Future<List<Map<String, dynamic>>> _fetchAppointments() async {
+    final userId = AuthenticationRepository.instance.authUser?.uid;
+    if (userId == null) {
+      throw 'User not authenticated';
+    }
+    return UserRepository().getAppointments(userId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -125,19 +156,33 @@ class _LandingPageState extends State<LandingPage> {
                   ),
                 ),
                 const SizedBox(height: 25),
-                // Use placeholder for appointment card
-                AppointmentCard(
-                  doctor: {
-                    'doctor_profile': '', // Placeholder profile image
-                    'doctor_name': 'John Doe',
-                    'category': 'General',
-                    'appointments': {
-                      'day': 'Monday',
-                      'date': '1st Jan',
-                      'time': '10:00 AM'
+                FutureBuilder<List<Map<String, dynamic>>>(
+                  future: _appointmentsFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
                     }
+                    if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    }
+                    if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const Center(child: Text('No appointments found'));
+                    }
+
+                    final appointments = snapshot.data!;
+                    return Column(
+                      children: appointments.map((appointment) {
+                        return AppointmentCard(
+                          doctorId: appointment['doctorId'] ?? '',
+                          doctorName: appointment['doctorName'] ?? '',
+                          date: appointment['date'] ?? '',
+                          day: appointment['day'] ?? '',
+                          time: appointment['time'] ?? '',
+                          color: Color.fromARGB(255, 216, 244, 229),
+                        );
+                      }).toList(),
+                    );
                   },
-                  color: Color.fromARGB(255, 216, 244, 229),
                 ),
                 const SizedBox(height: 25),
                 const Text(
@@ -164,6 +209,10 @@ class _LandingPageState extends State<LandingPage> {
             ),
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _refreshPage,
+        child: Icon(Icons.refresh),
       ),
     );
   }

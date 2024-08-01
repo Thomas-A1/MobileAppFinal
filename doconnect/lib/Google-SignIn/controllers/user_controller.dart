@@ -99,4 +99,6 @@ Future<void> uploadUserProfilePicture() async {
     Loaders.errorSnackBar(title: "ohwww...", message: e.toString());
   }
 }
+
+String? get userId => user.value.id;
 }

@@ -13,6 +13,7 @@ class DoctorController extends GetxController {
 
 
   Rx<UserModel> doctor = UserModel.empty().obs;
+  RxList<UserModel> favoriteDoctors = <UserModel>[].obs;
   RxBool isFav = false.obs;
 
 
@@ -158,6 +159,17 @@ void toggleFavorite() async {
           title: "Updated", message: "Expertise updated successfully");
     } catch (e) {
       Loaders.errorSnackBar(title: "Error", message: e.toString());
+    }
+  }
+
+
+  Future<void> fetchFavoriteDoctors() async {
+    try {
+      final userId = user.value.id; // Get the current user's ID
+      final doctors = await doctorRepository.fetchFavoriteDoctors(userId);
+      favoriteDoctors.value = doctors;
+    } catch (e) {
+      print('Error fetching favorite doctors: $e');
     }
   }
 }

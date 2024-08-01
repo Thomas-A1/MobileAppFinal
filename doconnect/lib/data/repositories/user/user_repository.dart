@@ -88,4 +88,57 @@ class UserRepository extends GetxController {
       throw 'Something went wrong. Please try again';
     }
   }
+
+
+
+
+  Future<void> addAppointment(
+    String doctorId, 
+    String doctorName, 
+    String date, 
+    String day, 
+    String time,
+  ) async {
+    try {
+      final userId = AuthenticationRepository.instance.authUser?.uid;
+
+      if (userId == null) {
+        throw 'User not authenticated';
+      }
+
+      final appointmentData = {
+        'doctorId': doctorId,
+        'doctorName': doctorName,
+        'date': date,
+        'day': day,
+        'time': time,
+      };
+
+      await _db.collection('Users').doc(userId)
+        .collection('appointments') // Appointments sub-collection
+        .add(appointmentData);
+    } catch (e) {
+      throw 'Error adding appointment: $e';
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> getAppointments(String userId) async {
+  List<Map<String, dynamic>> appointments = [];
+  try {
+    CollectionReference appointmentsRef = _db
+        .collection('Users')
+        .doc(userId)
+        .collection('appointments');
+    
+    QuerySnapshot querySnapshot = await appointmentsRef.get();
+    for (var doc in querySnapshot.docs) {
+      appointments.add(doc.data() as Map<String, dynamic>);
+    }
+  } catch (e) {
+    print("Error fetching appointments: $e");
+  }
+  return appointments;
+}
+
+
 }

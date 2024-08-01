@@ -69,7 +69,6 @@
 
 import 'package:doconnect/Google-SignIn/controllers/user_controller.dart';
 import 'package:doconnect/Models/auth_model.dart';
-import 'package:doconnect/authentication/screens/login/login.dart';
 import 'package:doconnect/authentication/screens/onboarding/onboarding.dart';
 import 'package:doconnect/data/repositories/doctors/doctor_controller.dart';
 import 'package:doconnect/utils/Navigation/doctor_navigation.dart';
